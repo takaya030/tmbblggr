@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use \Illuminate\Http\Request;
 use \App\Http\Models\Tumblr\PostFactory;
+use \App\Http\Models\Tumblr\PostSubscriber;
 use \App\Http\Models\Google\Gmail;
 use App\Http\Models\Google\Datastore;
 use App\Http\Models\Google\Datastore\Entity;
@@ -135,5 +136,18 @@ class TumblrController extends Controller
 		}
 
 		return [ $real_offset, $real_limit ];
+	}
+
+	public function getSubscribe( Request $request )
+	{
+		$start = (int)$request->input('start');
+		if(empty($start) )
+		{
+			$start = \Carbon\Carbon::now()->timestamp;
+		}
+
+		$subscriber = new PostSubscriber();
+		$posts = $subscriber->retrievePosts( $start, 5 );
+		dd( $posts );
 	}
 }

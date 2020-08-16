@@ -17,3 +17,4 @@ $router->get('/', function () use ($router) {
 
 // send Tumblr my posts to Gmail
 $router->get('/tumblr',  'TumblrController@getPosts' );
+$router->get('/subscribe',  'TumblrController@getSubscribe' );
