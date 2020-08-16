@@ -1,3 +1,3 @@
-# TmbGml
+# TmbBlggr
 
-PHP Scripts sending Tumblr posts to Gmail
+PHP Scripts sending Tumblr posts to Blogger
