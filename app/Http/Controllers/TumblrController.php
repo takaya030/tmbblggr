@@ -141,13 +141,19 @@ class TumblrController extends Controller
 	public function getSubscribe( Request $request )
 	{
 		$start = (int)$request->input('start');
+		$end = (int)$request->input('end');
 		if(empty($start) )
 		{
 			$start = \Carbon\Carbon::now()->timestamp;
 		}
+		if(empty($end) )
+		{
+			$end = \Carbon\Carbon::now()->subDays(7)->timestamp;
+		}
 
 		$subscriber = new PostSubscriber();
-		$posts = $subscriber->retrievePosts( $start, 5 );
+		//$posts = $subscriber->retrievePosts( $start, 5 );
+		$posts = $subscriber->getPostsBySpan( $start, $end, 22 );
 		dd( $posts );
 	}
 }

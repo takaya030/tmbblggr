@@ -50,4 +50,47 @@ class PostSubscriber
 
 		return ( is_array( $result->response->posts ) )? $result->response->posts : [];
 	}
+
+    /**
+     * @param int $tstart_at [require] Returns posts published earlier than a specified Unitx timestamp. (newest timestamp)
+     * @param int $end_at [require] Returns posts published later than a specified Unitx timestamp. (oldest timestamp)
+	 * @param int $limit [optional] The number of posts to return.
+	 * @return array $posts
+     */
+	public function getPostsBySpan( int $start_at, int $end_at, int $limit = 100 )
+	{
+		$next_time = $start_at;
+		$remain = $limit;
+		$all_posts = [];
+
+		while( $next_time > $end_at && $remain > 0 )
+		{
+			$result = $this->retrievePosts( $next_time );
+			if( empty($result) )
+			{
+				// no more posts
+				$remain = 0;
+			}
+			else
+			{
+				$all_posts = array_merge( $all_posts, $result );
+				$remain -= count($result);
+
+				$last_post = array_pop( $result );
+				$next_time = $last_post->timestamp;
+
+				if( $next_time > $end_at && $remain > 0 )
+				{
+					sleep(2);
+				}
+			}
+		}
+
+		if( count($all_posts) > $limit )
+		{
+			$all_posts = array_slice( $all_posts, 0, $limit );
+		}
+
+		return $all_posts;
+	}
 }
