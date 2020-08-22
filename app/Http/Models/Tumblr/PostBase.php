@@ -63,7 +63,7 @@ abstract class PostBase
 
 	public function getPublished()
 	{
-		$this->timestamp;
+		return $this->timestamp;
 	}
 
 	public function getTitle()
