@@ -7,6 +7,7 @@ use \App\Http\Models\Tumblr\PostFactory;
 use \App\Http\Models\Tumblr\PostSubscriber;
 use \App\Http\Models\Google\Gmail;
 use App\Http\Models\Google\Datastore;
+use \App\Http\Models\Google\Blogger;
 use App\Http\Models\Google\Datastore\Entity;
 
 class TumblrController extends Controller
@@ -152,8 +153,22 @@ class TumblrController extends Controller
 		}
 
 		$subscriber = new PostSubscriber();
-		//$posts = $subscriber->retrievePosts( $start, 5 );
-		$posts = $subscriber->getPostsBySpan( $start, $end, 22 );
-		dd( $posts );
+		//$raw_posts = $subscriber->retrievePosts( $start, 5 );
+		$raw_posts = $subscriber->getPostsBySpan( $start, $end, 22 );
+		$post_objs = [];
+
+		foreach( $raw_posts as $post_item )
+		{
+			$post_obj = PostFactory::create( $post_item );
+			if( !is_null($post_obj) )
+			{
+				$post_objs[] = $post_obj;
+			}
+		}
+
+		$blogger = new Blogger();
+		$blogger->insertPost( $post_objs[0] );
+
+		dd( $post_objs );
 	}
 }
