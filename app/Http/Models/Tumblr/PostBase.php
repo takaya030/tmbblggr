@@ -10,8 +10,8 @@ use \Carbon\Carbon;
 abstract class PostBase
 {
 	protected $data = null;
-	protected $subject;			// mail subject
-	protected $timestamp;		// rfc2822 string
+	protected $subject;			// blog subject
+	protected $timestamp;		// rfc3339 date-time
 	protected $tags = [];
 
 
@@ -26,7 +26,7 @@ abstract class PostBase
 
 	private function parse_common()
 	{
-		$this->timestamp = Carbon::createFromTimestamp($this->data->timestamp, 'Asia/Tokyo')->toRfc2822String();
+		$this->timestamp = Carbon::createFromTimestamp($this->data->timestamp, 'Asia/Tokyo')->toRfc3339String();
 
 		if( !empty($this->data->tags) )
 		{
@@ -46,34 +46,13 @@ abstract class PostBase
 		$subject = (mb_strlen($subject,'utf-8') > 32)? 
 			mb_substr($subject, 0, 32) . '...' :
 			$subject;
+		// replace tab,cr to space
+		$subject = preg_replace('/[\n\r\t]/', ' ', $subject);
+		$subject = preg_replace('/\s+/', ' ', $subject);
 
 		$type_str = $this->getTypeStr();
 
 		return '[' . $type_str . '] ' . $subject;
-	}
-
-
-	public function getPostData()
-	{
-		return 'Date: '. $this->timestamp ."\r\n" .
-			'From: '. env('TUMBLR_FROM_USER') ."\r\n" .
-			'To: '. env('TUMBLR_TO_USER') ."\r\n" .
-			'Subject: '. $this->makeEncodedSubject() ."\r\n" .
-			"Content-Type: text/html; charset=UTF-8\r\n" .
-			"\r\n" .
-			'<html><body>'. $this->getMailBody() .'</body></html>';
-	}
-
-	private function makeEncodedSubject()
-	{
-		return '=?utf-8?B?' . base64_encode($this->subject) . '?=';
-	}
-
-	private function getMailBody()
-	{
-		return $this->getPostBody() .
-			$this->getTagsStr() .
-			$this->getPermaLink();
 	}
 
 	private function getPermaLink()
@@ -81,9 +60,26 @@ abstract class PostBase
 		return '<div><a href="' . $this->data->post_url . '">Permalink</a></div><br />';
 	}
 
-	private function getTagsStr()
+
+	public function getPublished()
 	{
-		return ( count( $this->tags ) > 0 )?  '<div>tags: ' . implode( ',', $this->tags ) . '</div><br />' : "";
+		$this->timestamp;
+	}
+
+	public function getTitle()
+	{
+		return $this->subject;
+	}
+
+	public function getTags()
+	{
+		return $this->tags;
+	}
+
+	public function getContent()
+	{
+		return $this->getPostBody() .
+			$this->getPermaLink();
 	}
 
 
