@@ -16,7 +16,8 @@ class TmbBlggr extends Command
 	protected $signature = 'tmb:blggr
 {start_time : Start published datetime (newest) (rfc3339 yyyy-mm-ddThh:mi:ss)}
 {end_time : End published datetime (oldest) (rfc3339 yyyy-mm-ddThh:mi:ss)}
-{--limit=100 : Limit number of posts}';
+{--limit=100 : Limit number of posts}
+{--dry-run : enable dry run}';
 
     /**
      * The console command description.
@@ -47,6 +48,8 @@ class TmbBlggr extends Command
 		$start_time = $carbon->createFromFormat( 'Y-m-d\TH:i:s', $this->argument('start_time') )->timestamp;		// from rfc3339 to unix timestamp
 		$end_time = $carbon->createFromFormat( 'Y-m-d\TH:i:s', $this->argument('end_time') )->timestamp;		// from rfc3339 to unix timestamp
 		$limit = $this->option('limit');
+		//$dry_run = $this->option('dry-run');
+		$dry_run = true;
 
         $this->info("start time {$start_time}");
         $this->info("end time {$end_time}");
@@ -70,6 +73,10 @@ class TmbBlggr extends Command
 		{
 			$id = $i + 1;
 			$this->info( "{$id}/{$num_objs} " . $post_objs[$i]->getDebugInfo() );
+
+			if( !$dry_run )
+			{
+			}
 		}
     }
 }
