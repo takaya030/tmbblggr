@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use \App\Http\Models\Tumblr\PostSubscriber;
+use \App\Http\Models\Tumblr\PostFactory;
 
 class TmbBlggr extends Command
 {
@@ -49,5 +51,25 @@ class TmbBlggr extends Command
         $this->info("start time {$start_time}");
         $this->info("end time {$end_time}");
         $this->info("limit {$limit}");
+
+		$subscriber = new PostSubscriber();
+		$raw_posts = $subscriber->getPostsBySpan( $start_time, $end_time, $limit );
+		$post_objs = [];
+
+		foreach( $raw_posts as $post_item )
+		{
+			$post_obj = PostFactory::create( $post_item );
+			if( !is_null($post_obj) )
+			{
+				$post_objs[] = $post_obj;
+			}
+		}
+
+		$num_objs = count($post_objs);
+		for( $i=0; $i<$num_objs; $i++ )
+		{
+			$id = $i + 1;
+			$this->info( "{$id}/{$num_objs} " . $post_objs[$i]->getDebugInfo() );
+		}
     }
 }
