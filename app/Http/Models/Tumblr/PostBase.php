@@ -82,6 +82,11 @@ abstract class PostBase
 			$this->getPermaLink();
 	}
 
+	public function getDebugInfo()
+	{
+		return $this->getPublished() . ' ' . $this->getTitle();
+	}
+
 
 	// custom parser for derived class
 	abstract protected function parse();
