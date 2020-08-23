@@ -86,6 +86,9 @@ class PostSubscriber
 			}
 		}
 
+		// drop posts older than end_at
+		$all_posts = array_filter( $all_posts, function($v) use ($end_at) { return( $v->timestamp >= $end_at); });
+
 		if( count($all_posts) > $limit )
 		{
 			$all_posts = array_slice( $all_posts, 0, $limit );
