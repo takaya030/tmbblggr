@@ -143,18 +143,24 @@ class TumblrController extends Controller
 	{
 		$start = (int)$request->input('start');
 		$end = (int)$request->input('end');
+		$limit = (int)$request->input('limit');
 		if(empty($start) )
 		{
-			$start = \Carbon\Carbon::now()->timestamp;
+			return;
 		}
 		if(empty($end) )
 		{
-			$end = \Carbon\Carbon::now()->subDays(7)->timestamp;
+			return;
+		}
+		if( empty($limit) )
+		{
+			return;
 		}
 
+		ini_set("max_execution_time",1800);
+
 		$subscriber = new PostSubscriber();
-		//$raw_posts = $subscriber->retrievePosts( $start, 5 );
-		$raw_posts = $subscriber->getPostsBySpan( $start, $end, 22 );
+		$raw_posts = $subscriber->getPostsBySpan( $start, $end, $limit );
 		$post_objs = [];
 
 		foreach( $raw_posts as $post_item )
@@ -167,8 +173,16 @@ class TumblrController extends Controller
 		}
 
 		$blogger = new Blogger();
-		$blogger->insertPost( $post_objs[0] );
+		$num_objs = count($post_objs);
+		for( $i=0; $i<$num_objs; $i++ )
+		{
+			$result = $blogger->insertPost( $post_objs[$i] );
+			if( !$result )
+			{
+				break;
+			}
+		}
 
-		dd( $post_objs );
+		//dd( $post_objs );
 	}
 }
