@@ -12,8 +12,7 @@ class PostSubscriber
 	private $base_uri = 'https://api.tumblr.com';
 	protected $client;		// \GuzzleHttp\Client
 	protected $posts = [];
-
-	protected $timestamp;		// rfc2822 string
+	protected $last_timestamp = null;
 
 
 	public function __construct()
@@ -21,6 +20,11 @@ class PostSubscriber
 		$this->client = new \GuzzleHttp\Client([
 			'base_uri' => $this->base_uri,
 		]);
+	}
+
+	public function getLastTimestamp()
+	{
+		return $this->last_timestamp;
 	}
 
     /**
@@ -90,6 +94,18 @@ class PostSubscriber
 		{
 			$all_posts = array_slice( $all_posts, 0, $limit );
 		}
+
+		// store last timestamp of posts
+		if( count($all_posts) > 0 )
+		{
+			$last_post = end($all_posts);
+			$this->last_timestamp = $last_post->timestamp;
+		}
+		else
+		{
+			$this->last_timestamp = $end_at;
+		}
+
 
 		return $all_posts;
 	}
