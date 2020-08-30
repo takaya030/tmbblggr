@@ -13,10 +13,7 @@ class PostSubscriber
 	protected $client;		// \GuzzleHttp\Client
 	protected $posts = [];
 
-	protected $data = null;
-	protected $subject;			// mail subject
 	protected $timestamp;		// rfc2822 string
-	protected $tags = [];
 
 
 	public function __construct()
