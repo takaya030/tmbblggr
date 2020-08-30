@@ -78,5 +78,10 @@ class TmbBlggr extends Command
 			{
 			}
 		}
+
+		$last_timestamp = $subscriber->getLastTimestamp();
+		$carbon = new \Carbon\Carbon();
+		$time_str = $carbon->createFromTimestamp($last_timestamp, 'Asia/Tokyo')->format('Y-m-d\TH:i:sP T');
+		$this->info("last timestamp {$last_timestamp} ({$time_str})");
     }
 }
