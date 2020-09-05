@@ -66,6 +66,11 @@ abstract class PostBase
 		return $this->timestamp;
 	}
 
+	public function getUnixtimestamp()
+	{
+		return $this->data->timestamp;
+	}
+
 	public function getTitle()
 	{
 		return $this->subject;
