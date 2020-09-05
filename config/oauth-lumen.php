@@ -22,7 +22,7 @@ return [
 		'MyGoogle' => [
 			'client_id'     => env('GOOGLE_CLIENT_ID'),
 			'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-			'scope'         => ['https://www.googleapis.com/auth/blogger'],
+			'scope'         => ['https://www.googleapis.com/auth/blogger','https://www.googleapis.com/auth/datastore'],
 		],
 
 	]
