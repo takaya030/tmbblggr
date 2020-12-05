@@ -58,7 +58,7 @@ class PostSubscriber
 	 * @param int $limit [optional] The number of posts to return.
 	 * @return array $posts
      */
-	public function getPostsBySpan( int $start_at, int $end_at, int $limit = 100 )
+	public function getPostsBySpan( int $start_at, int $end_at, int $limit = 40 )
 	{
 		$next_time = $start_at;
 		$remain = $limit;
