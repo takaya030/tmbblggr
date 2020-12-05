@@ -54,8 +54,9 @@ class TumblrController extends Controller
 		}
 
 
+		$retrieve = 40;
 		$subscriber = new PostSubscriber();
-		$raw_posts = $subscriber->getPostsBySpan( $start_time, $end_time, $limit );
+		$raw_posts = $subscriber->getPostsBySpan( $start_time, $end_time, $retrieve );
 		$post_objs = [];
 
 		foreach( $raw_posts as $post_item )
@@ -65,6 +66,11 @@ class TumblrController extends Controller
 			{
 				$post_objs[] = $post_obj;
 			}
+		}
+
+		if( count($post_objs) > $limit )
+		{
+			$post_objs = array_slice( $post_objs, 0, $limit );
 		}
 
 		$blogger = new Blogger();
@@ -84,10 +90,12 @@ class TumblrController extends Controller
 			}
 		}
 
+		/*
 		if( $is_error == false )
 		{
 			$next_start_time = $subscriber->getLastTimestamp();
 		}
+		 */
 
 		// update next start
 		if( $start_time > $next_start_time )
