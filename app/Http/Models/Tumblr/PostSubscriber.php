@@ -109,4 +109,21 @@ class PostSubscriber
 
 		return $all_posts;
 	}
+
+    /**
+     * @param int $end_at [require] Returns posts published later than a specified Unitx timestamp. (oldest timestamp)
+     * @param int $add_sec [require] Offset seconds from $end_at. ($start_at = $end_at + $add_sec)
+	 * @param int $limit [optional] The number of posts to return.
+	 * @return array $posts
+     */
+	public function getPostsFromEndAt( int $end_at, int $add_sec, int $limit = 40 )
+	{
+		$start_at = $end_at + $add_sec + 1;			// for include the post that timestamp is (timestamp == end_at + add_sec)
+		$posts = $this->getPostsBySpan( $start_at, $end_at, $limit );
+
+		// drop posts older than end_at or equal
+		$posts = array_filter( $posts, function($v) use ($end_at) { return( $v->timestamp > $end_at); });
+
+		return $posts;
+	}
 }
