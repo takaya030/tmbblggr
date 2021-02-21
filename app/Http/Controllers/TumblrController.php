@@ -206,4 +206,39 @@ class TumblrController extends Controller
 			'limit' => $limit,
 		]);
 	}
+
+	public function getRebloggirl( Request $request )
+	{
+		$token = $request->input('oauth_token');
+		$verify = $request->input('oauth_verifier');
+
+		// get tumblr service
+		$tmb = app('oauth')->consumer( 'Tumblr' );
+
+		// if code is provided get user data and sign in
+		if ( !empty( $token ) && !empty( $verify ) ) {
+
+			// This was a callback request from tumblr, get the token
+			$token = $tmb->requestAccessToken( $token, $verify );
+
+			// Send a request with it
+			$result = json_decode( $tmb->request( 'user/info' ), true );
+
+			//Var_dump
+			//display whole array().
+			dd(['result' => $result,'token' => $token]);
+
+		}
+		// if not ask for permission first
+		else {
+			// get request token
+			$reqToken = $tmb->requestRequestToken();
+
+			// get Authorization Uri sending the request token
+			$url = $tmb->getAuthorizationUri(['oauth_token' => $reqToken->getRequestToken()]);
+
+			// return to tumblr login url
+			return redirect( (string)$url );
+		}
+	}
 }
