@@ -24,6 +24,10 @@ return [
 			'client_secret' => env('GOOGLE_CLIENT_SECRET'),
 			'scope'         => ['https://www.googleapis.com/auth/blogger','https://www.googleapis.com/auth/datastore'],
 		],
+		'Tumblr' => [
+			'client_id'     => env('TUMBLR_API_KEY'),
+			'client_secret' => env('TUMBLR_SECRET_KEY'),
+		],
 
 	]
 
