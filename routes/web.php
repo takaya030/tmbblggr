@@ -18,3 +18,4 @@ $router->get('/', function () use ($router) {
 // send Tumblr my posts to Blogger
 $router->get('/subscribe',  'TumblrController@getSubscribe' );
 $router->get('/fromend',  'TumblrController@getFromend' );
+$router->get('/rebloggirl',  'TumblrController@getRebloggirl' );
