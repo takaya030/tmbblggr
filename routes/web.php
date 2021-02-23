@@ -19,3 +19,4 @@ $router->get('/', function () use ($router) {
 $router->get('/subscribe',  'TumblrController@getSubscribe' );
 $router->get('/fromend',  'TumblrController@getFromend' );
 $router->get('/rebloggirl',  'TumblrController@getRebloggirl' );
+$router->get('/userinfo',  'TumblrController@getUserinfo' );

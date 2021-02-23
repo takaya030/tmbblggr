@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use \Illuminate\Http\Request;
 use \App\Http\Models\Tumblr\PostFactory;
 use \App\Http\Models\Tumblr\PostSubscriber;
+use \App\Http\Models\Tumblr\OAuthClient;
+use \App\Http\Models\Tumblr\Reblog;
 use App\Http\Models\Google\Datastore;
 use \App\Http\Models\Google\Blogger;
 use App\Http\Models\Google\Datastore\Entity;
@@ -209,36 +211,42 @@ class TumblrController extends Controller
 
 	public function getRebloggirl( Request $request )
 	{
-		$token = $request->input('oauth_token');
-		$verify = $request->input('oauth_verifier');
-
-		// get tumblr service
-		$tmb = app('oauth')->consumer( 'Tumblr' );
-
-		// if code is provided get user data and sign in
-		if ( !empty( $token ) && !empty( $verify ) ) {
-
-			// This was a callback request from tumblr, get the token
-			$token = $tmb->requestAccessToken( $token, $verify );
-
-			// Send a request with it
-			$result = json_decode( $tmb->request( 'user/info' ), true );
-
-			//Var_dump
-			//display whole array().
-			dd(['result' => $result,'token' => $token]);
-
+		$start = (int)$request->input('start');
+		$end = (int)$request->input('end');
+		//$limit = (int)$request->input('limit');
+		if(empty($start) )
+		{
+			return;
 		}
-		// if not ask for permission first
-		else {
-			// get request token
-			$reqToken = $tmb->requestRequestToken();
-
-			// get Authorization Uri sending the request token
-			$url = $tmb->getAuthorizationUri(['oauth_token' => $reqToken->getRequestToken()]);
-
-			// return to tumblr login url
-			return redirect( (string)$url );
+		if(empty($end) )
+		{
+			return;
 		}
+		/*
+		if( empty($limit) )
+		{
+			return;
+		}
+		 */
+
+		ini_set("max_execution_time",1800);
+
+		$retrieve = 3;
+		$subscriber = new PostSubscriber();
+		$raw_posts = $subscriber->getPostsBySpan( $start, $end, $retrieve, 'girl' );
+
+		//dd($raw_posts);
+
+		$reblog = new Reblog();
+		$result = $reblog->doReblog( $raw_posts[0] );
+
+		dd($result);
+	}
+
+	public function getUserinfo( Request $request )
+	{
+		$tmb = new OAuthClient();
+		$result = $tmb->getUserinfo();
+		dd($result);
 	}
 }
