@@ -43,7 +43,7 @@ class PostSubscriber
 
 		if( $tag !== '' )
 		{
-			$quwey['tag'] = $tag;
+			$query['tag'] = $tag;
 		}
 
 		$response = $this->client->request('GET', '/v2/blog/'.env('TUMBLR_USER_ID').'.tumblr.com/posts', [ 'query' => $query ]);
@@ -64,17 +64,19 @@ class PostSubscriber
      * @param int $tstart_at [require] Returns posts published earlier than a specified Unitx timestamp. (newest timestamp)
      * @param int $end_at [require] Returns posts published later than a specified Unitx timestamp. (oldest timestamp)
 	 * @param int $limit [optional] The number of posts to return.
+	 * @param string $tag [optional] Limits the response to posts with the specified tag
 	 * @return array $posts
      */
-	public function getPostsBySpan( int $start_at, int $end_at, int $limit = 40 )
+	public function getPostsBySpan( int $start_at, int $end_at, int $limit = 40, string $tag = '' )
 	{
 		$next_time = $start_at;
 		$remain = $limit;
+		$retrieve_limit = 20;
 		$all_posts = [];
 
 		while( $next_time > $end_at && $remain > 0 )
 		{
-			$result = $this->retrievePosts( $next_time );
+			$result = $this->retrievePosts( $next_time, $retrieve_limit, $tag );
 			if( empty($result) )
 			{
 				// no more posts
