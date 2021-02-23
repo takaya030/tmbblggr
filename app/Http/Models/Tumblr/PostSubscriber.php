@@ -30,15 +30,23 @@ class PostSubscriber
     /**
      * @param int $timestamp [require] Returns posts published earlier than a specified Unitx timestamp.
 	 * @param int $limit [optional] The number of posts to return: 1-20, inclusive.
+	 * @param string $tag [optional] Limits the response to posts with the specified tag
 	 * @return array $posts
      */
-	public function retrievePosts( int $timestamp, int $limit = 20 )
+	public function retrievePosts( int $timestamp, int $limit = 20, string $tag = '' )
 	{
-		$response = $this->client->request('GET', '/v2/blog/'.env('TUMBLR_USER_ID').'.tumblr.com/posts', [ 'query' => [
+		$query = [
 			'api_key'		=> env('TUMBLR_API_KEY'),
 			'before'		=> $timestamp,
 			'limit'			=> $limit,
-		]]);
+		];
+
+		if( $tag !== '' )
+		{
+			$quwey['tag'] = $tag;
+		}
+
+		$response = $this->client->request('GET', '/v2/blog/'.env('TUMBLR_USER_ID').'.tumblr.com/posts', [ 'query' => $query ]);
 
 		$response_body = (string)$response->getBody();
 		$result = json_decode( $response_body );
