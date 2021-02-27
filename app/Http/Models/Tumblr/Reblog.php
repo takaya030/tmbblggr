@@ -21,6 +21,7 @@ class Reblog extends OAuthClient
 		];
 
 		$result = json_decode($this->service->request('blog/'. $this->blog_id .'.tumblr.com/post/reblog','POST', $body), true);
+		sleep(1);
 
 		return( $result['meta']['status'] == 201 );
 	}
