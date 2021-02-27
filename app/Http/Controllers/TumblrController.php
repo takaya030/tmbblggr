@@ -211,36 +211,66 @@ class TumblrController extends Controller
 
 	public function getRebloggirl( Request $request )
 	{
-		$start = (int)$request->input('start');
-		$end = (int)$request->input('end');
-		//$limit = (int)$request->input('limit');
-		if(empty($start) )
-		{
-			return;
-		}
-		if(empty($end) )
-		{
-			return;
-		}
-		/*
-		if( empty($limit) )
-		{
-			return;
-		}
-		 */
-
 		ini_set("max_execution_time",1800);
 
-		$retrieve = 3;
-		$subscriber = new PostSubscriber();
-		$raw_posts = $subscriber->getPostsBySpan( $start, $end, $retrieve, 'girl' );
+		$datastore = new Datastore();
+		$entity = $datastore->lookup( env('REBLOGGIRL_KIND'), env('TUMBLR_USER_ID') );
+		if( $entity instanceof Entity )
+		{
+			// start timestamp (newest)
+			$start_time  = $next_start_time = (int)$entity->get('start');
+			// end timestamp (oldest)
+			$end_time = (int)$entity->get('end');
+			// limit
+			$limit = (int)$entity->get('limit');
+		}
+		else
+		{
+			return response()->json([
+				'msg' => "fail to lookup Datastore.",
+				'kind' => env('REBLOGGIRL_KIND'),
+				'key' => env('TUMBLR_USER_ID'),
+			]);
+		}
 
-		//dd($raw_posts);
+		$limit = max(1,$limit);
+		$limit = min(5,$limit);
+		$retrieve = $limit;
+		$subscriber = new PostSubscriber();
+		$raw_posts = $subscriber->getPostsBySpan( $start_time, $end_time, $retrieve, 'girl' );
 
 		$reblog = new Reblog();
-		$result = $reblog->doReblog( $raw_posts[0] );
+		$is_error = false;
+		foreach( $raw_posts as $post_item )
+		{
+			$result = $reblog->doReblog( $post_item );
+			if( $result == false )
+			{
+				$is_error = true;
+				break;
+			}
+			else
+			{
+				$next_start_time = $post_item->timestamp;
+			}
+		}
 
-		dd($result);
+		// update next start
+		if( $start_time > $next_start_time )
+		{
+			$datastore->upsert( env('REBLOGGIRL_KIND'), env('TUMBLR_USER_ID'), [
+				'start' => $next_start_time,
+				'end' => $end_time,
+				'limit' => $limit,
+			] );
+		}
+
+		return response()->json([
+			'msg' => "success to reblog girl.",
+			'next_start' => $next_start_time,
+			'end' => $end_time,
+			'limit' => $limit,
+		]);
 	}
 
 	public function getUserinfo( Request $request )
